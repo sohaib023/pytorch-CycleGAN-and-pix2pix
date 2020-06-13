@@ -13,7 +13,7 @@ else:
     VisdomExceptionBase = ConnectionError
 
 
-def save_images(webpage, visuals, image_path, aspect_ratio=1.0, width=256):
+def save_images(webpage, visuals, image_path, aspect_ratio=1.0, width=256, isTrain=True):
     """Save images to the disk.
 
     Parameters:
@@ -33,8 +33,13 @@ def save_images(webpage, visuals, image_path, aspect_ratio=1.0, width=256):
     ims, txts, links = [], [], []
 
     for label, im_data in visuals.items():
+        if im_data is None or (isTrain is False and label != 'fake_B'):
+            continue
         im = util.tensor2im(im_data)
-        image_name = '%s_%s.png' % (name, label)
+        if isTrain:
+            image_name = '%s_%s.png' % (name, label)
+        else:
+            image_name = '%s.png' % (name)
         save_path = os.path.join(image_dir, image_name)
         util.save_image(im, save_path, aspect_ratio=aspect_ratio)
         ims.append(image_name)
